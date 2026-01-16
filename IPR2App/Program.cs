@@ -4,8 +4,7 @@ using IPR2App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-//builder.Services.AddRazorPages(); 
+builder.Services.AddControllers(); 
 builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoService>();
@@ -14,10 +13,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularClient", policy =>
     {
-        policy.WithOrigins("http://localhost:4200") // Адрес Angular
+        policy.WithOrigins("http://localhost:4200") 
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // !!! ОБЯЗАТЕЛЬНО ДЛЯ SIGNALR !!!
+              .AllowCredentials();
     });
 });
 
@@ -44,7 +43,7 @@ app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.MapControllers();
-//app.MapRazorPages();              
+
 app.MapHub<RecordsHub>("/records-hub"); 
 app.MapGraphQL("/graphql");
 
