@@ -1,0 +1,6 @@
+@IPR2_HostAddress = http://localhost:5244
+
+GET {{IPR2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
