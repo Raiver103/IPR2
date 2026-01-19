@@ -16,12 +16,16 @@ export interface TodoList { id: string; name: string; items: TodoItem[]; }
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  title = 'client-app';
-  
-  listName = '';      
+  listName = '';
   listItemsStr = '';
-  
+  protected Math = Math;
   records: TodoList[] = [];
+  
+  currentPage = 0;  
+  pageSize = 5;    
+  totalCount = 0;    
+  
+  filterText = ''; 
 
   constructor(
     public signalrService: SignalrService,
@@ -30,12 +34,71 @@ export class App implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadRecords();
+
     this.signalrService.startConnection();
 
-    this.signalrService.records$.subscribe((data) => { 
-      this.records = data;
-      this.cdr.detectChanges(); 
+    this.signalrService.records$.subscribe(() => {
+      console.log('SignalR: New data has arrived, we are updating the list...');
+      this.loadRecords();
     });
+  }
+ 
+  loadRecords() { 
+    const skip = this.currentPage * this.pageSize;
+ 
+    const query = {
+      query: `
+        query {
+          records(
+            skip: ${skip}, 
+            take: ${this.pageSize}, 
+            order: { createdAt: DESC }, 
+            where: { name: { contains: "${this.filterText}" } }
+          ) {
+            totalCount
+            items {
+              id
+              name
+              items {
+                text
+              }
+            }
+          }
+        }
+      `
+    };
+
+    this.http.post<any>('https://localhost:7171/graphql', query).subscribe({
+      next: (res) => {
+        const data = res.data?.records;
+        if (data) {
+          this.records = data.items; 
+          this.totalCount = data.totalCount; 
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  nextPage() {
+    if ((this.currentPage + 1) * this.pageSize < this.totalCount) {
+      this.currentPage++;
+      this.loadRecords();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadRecords();
+    }
+  }
+
+  onSearchChange() {
+    this.currentPage = 0;
+    this.loadRecords();
   }
 
   sendMessage() {
@@ -44,42 +107,24 @@ export class App implements OnInit {
     const nameToSend = this.listName; 
     const rawItemsStr = this.listItemsStr;
 
-    const itemsArray = rawItemsStr
-        .split(',')                 
-        .map(s => s.trim())      
-        .filter(s => s.length > 0)   
+    const itemsArray = rawItemsStr.split(',').map(s => s.trim()).filter(s => s.length > 0)
         .map(s => `{ text: "${s}" }`); 
-
     const itemsGraphQLString = `[${itemsArray.join(', ')}]`;
 
-    // Очищаем поля (Оптимистично)
     this.listName = ''; 
     this.listItemsStr = '';
 
     const query = {
       query: `
         mutation { 
-          addRecord(
-            name: "${nameToSend}", 
-            items: ${itemsGraphQLString} 
-          ) { 
+          addRecord(name: "${nameToSend}", items: ${itemsGraphQLString}) { 
             id 
-            name 
-            createdAt
-            items { 
-              text 
-              isCompleted
-            } 
           } 
         }`
     };
 
-    console.log('Query:', query); 
-
     this.http.post('https://localhost:7171/graphql', query).subscribe({ 
-      next: (res) => console.log('Успех:', res),
       error: (err) => {
-        console.error('Error:', err);
         this.listName = nameToSend;
         this.listItemsStr = rawItemsStr;
       }

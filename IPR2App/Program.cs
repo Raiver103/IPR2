@@ -35,7 +35,11 @@ builder.Services.AddCors(options =>
 builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
-    .AddMutationType<Mutation>();
+    .AddMutationType<Mutation>()
+    .AddMongoDbFiltering()   
+    .AddMongoDbSorting()      
+    .AddMongoDbProjections()
+    .AddMongoDbPagingProviders();
 
 var app = builder.Build();
  

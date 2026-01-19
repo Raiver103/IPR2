@@ -1,30 +1,58 @@
-<div class="container">
-  <h1>ToDo Lists</h1>
+<div class="container" style="max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+  
+  <h1>ToDo Manager (GraphQL + Mongo)</h1>
 
-  <div class="input-group">
-    <input 
-      [(ngModel)]="listName" 
-      placeholder="List name" 
-      style="margin-right: 10px;"
-    />
-
-    <input 
-      [(ngModel)]="listItemsStr" 
-      placeholder="Elements separated by commas" 
-      style="margin-right: 10px;"
-    />
-
-    <button (click)="sendMessage()">Create</button>
+  <div class="card add-form" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <h3>Add new list</h3>
+    <div style="display: flex; gap: 10px;">
+      <input [(ngModel)]="listName" placeholder="Title" style="flex: 1; padding: 8px;" />
+      <input [(ngModel)]="listItemsStr" placeholder="Tasks (separated by commas)" style="flex: 2; padding: 8px;" />
+      <button (click)="sendMessage()" style="padding: 8px 16px; background: #007bff; color: white; border: none; cursor: pointer;">
+        Create
+      </button>
+    </div>
   </div>
 
   <hr />
 
-  <div *ngFor="let list of records" style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
-    <h3>📂 {{ list.name }}</h3>
-    <ul>
-      <li *ngFor="let item of list.items">
-        {{ item.text }}
-      </li>
-    </ul>
+  <div class="controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    
+    <div>
+      <input 
+        [(ngModel)]="filterText" 
+        (input)="onSearchChange()" 
+        placeholder="Search by name..." 
+        style="padding: 6px; width: 200px;"
+      />
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button (click)="prevPage()" [disabled]="currentPage === 0">Back</button>
+      
+      <span>Page {{ currentPage + 1 }} / {{ Math.ceil(totalCount / pageSize) || 1 }}</span>
+      
+      <button (click)="nextPage()" [disabled]="(currentPage + 1) * pageSize >= totalCount">Forward</button>
+    </div>
+
   </div>
+
+  <div class="lists-container">
+    <div *ngIf="records.length === 0" style="text-align: center; color: gray;">
+      Записей не найдено...
+    </div>
+
+    <div *ngFor="let list of records" style="border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; border-radius: 5px;">
+      <div style="display: flex; justify-content: space-between;">
+        <h3 style="margin: 0; color: #333;">📂 {{ list.name }}</h3>
+        <small style="color: #999;">ID: {{ list.id.substring(0, 8) }}...</small>
+      </div>
+      
+      <ul style="margin-top: 10px; padding-left: 20px;">
+        <li *ngFor="let item of list.items">
+          {{ item.text }}
+        </li>
+      </ul>
+    </div>
+  </div>
+
 </div>

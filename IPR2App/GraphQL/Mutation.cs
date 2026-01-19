@@ -1,5 +1,5 @@
 ﻿using HotChocolate.Subscriptions;
-using IPR2.Hubs;      
+using IPR2.Hubs;
 using IPR2App.Models;
 using IPR2App.Services;
 using Microsoft.AspNetCore.SignalR;

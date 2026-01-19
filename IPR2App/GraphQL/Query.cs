@@ -1,13 +1,19 @@
-﻿using IPR2App.Models;
+﻿using HotChocolate.Data;
+using IPR2App.Models;
 using IPR2App.Services;
+using MongoDB.Driver;
 
 namespace IPR2App.GraphQL
 {
     public class Query
-    { 
-        public async Task<List<RecordModel>> GetRecords([Service] MongoService mongoService)
+    {
+        [UseOffsetPaging(IncludeTotalCount = true)]
+        [UseProjection]
+        [UseFiltering]
+        [UseSorting]
+        public IExecutable<RecordModel> GetRecords([Service] IMongoCollection<RecordModel> collection)
         {
-            return await mongoService.GetAsync();
+            return collection.AsExecutable();
         }
     }
 }

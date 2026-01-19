@@ -1,4 +1,4 @@
-﻿namespace IPR2App.Models
+﻿namespace IPR2App.GraphQL
 {
     public class RecordItemInput
     {
