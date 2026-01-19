@@ -1,22 +1,30 @@
-<div class="container" style="padding: 20px; font-family: sans-serif;">
-  <h1>Angular + SignalR + GraphQL</h1>
+<div class="container">
+  <h1>ToDo Lists</h1>
 
-  <div style="margin-bottom: 20px;">
-    <input type="text" [(ngModel)]="inputText" placeholder="Enter..." style="padding: 8px; width: 300px;">
-    
-    <button (click)="sendMessage()" [disabled]="!inputText" style="padding: 8px 16px; margin-left: 10px; cursor: pointer;">
-      Send
-    </button>
+  <div class="input-group">
+    <input 
+      [(ngModel)]="listName" 
+      placeholder="List name" 
+      style="margin-right: 10px;"
+    />
+
+    <input 
+      [(ngModel)]="listItemsStr" 
+      placeholder="Elements separated by commas" 
+      style="margin-right: 10px;"
+    />
+
+    <button (click)="sendMessage()">Create</button>
   </div>
 
-  <hr>
+  <hr />
 
-  <h3>Event feed (Real-Time):</h3>
-  
-  <ul style="list-style-type: none; padding: 0;">
-    <li *ngFor="let item of records" style="background: #e6fffa; border: 1px solid #b2f5ea; padding: 10px; margin-bottom: 5px; border-radius: 4px;">
-      <span style="color: #2c7a7b; font-weight: bold;">[{{ item.createdAt | date:'mediumTime' }}]</span> 
-      {{ item.name }}
-    </li>
-  </ul>
+  <div *ngFor="let list of records" style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+    <h3>📂 {{ list.name }}</h3>
+    <ul>
+      <li *ngFor="let item of list.items">
+        {{ item.text }}
+      </li>
+    </ul>
+  </div>
 </div>

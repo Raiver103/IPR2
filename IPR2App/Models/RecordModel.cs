@@ -12,5 +12,7 @@ namespace IPR2App.Models
         public string Name { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; }
+         
+        public List<RecordItem> Items { get; set; } = new List<RecordItem>();
     }
 }
