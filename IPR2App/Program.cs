@@ -12,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoService>();
+
 builder.Services.AddSingleton<IMongoCollection<RecordModel>>(sp =>
 {
     var db = sp.GetRequiredService<IMongoDatabase>();
