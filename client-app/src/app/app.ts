@@ -46,11 +46,13 @@ export class App implements OnInit {
  
   loadRecords() { 
     const skip = this.currentPage * this.pageSize;
+    const myId = this.signalrService.currentUserId;
  
     const query = {
       query: `
         query {
           records(
+            userId: "${myId}",
             skip: ${skip}, 
             take: ${this.pageSize}, 
             order: { createdAt: DESC }, 
@@ -102,6 +104,7 @@ export class App implements OnInit {
   }
 
   sendMessage() {
+    const myId = this.signalrService.currentUserId;
     if (!this.listName || !this.listItemsStr) return;
  
     const nameToSend = this.listName; 
@@ -117,7 +120,7 @@ export class App implements OnInit {
     const query = {
       query: `
         mutation { 
-          addRecord(name: "${nameToSend}", items: ${itemsGraphQLString}) { 
+          addRecord(userId: "${myId}", name: "${nameToSend}",  items: ${itemsGraphQLString}) { 
             id 
           } 
         }`

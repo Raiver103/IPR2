@@ -2,6 +2,8 @@
 using IPR2App.Models;
 using IPR2App.Services;
 using MongoDB.Driver;
+using System.Linq;
+using System;
 
 namespace IPR2App.GraphQL
 {
@@ -11,9 +13,10 @@ namespace IPR2App.GraphQL
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        public IExecutable<RecordModel> GetRecords([Service] IMongoCollection<RecordModel> collection)
+        public IExecutable<RecordModel> GetRecords([Service] IMongoCollection<RecordModel> collection,
+            string userId)
         {
-            return collection.AsExecutable();
+            return collection.Find(x => x.UserId == userId).AsExecutable();
         }
     }
 }

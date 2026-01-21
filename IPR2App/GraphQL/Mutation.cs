@@ -13,14 +13,15 @@ namespace IPR2App.GraphQL
             [Service] IMongoCollection<RecordModel> collection,
             [Service] IHubContext<RecordsHub> hubContext,
             string name,
-            List<RecordItemInput> items)
+            List<RecordItemInput> items,
+            string userId)
         {
             var newRecord = new RecordModel
             {
                 Id = Guid.NewGuid(),
                 Name = name,
-                CreatedAt = DateTime.UtcNow,
-
+                CreatedAt = DateTime.UtcNow, 
+                UserId = userId,
                 Items = items.Select(x => new RecordItem
                 {
                     Text = x.Text,
