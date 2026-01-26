@@ -1,10 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
-import { SignalrService } from './services/signalr.service';
-
+import { SignalrService } from './services/signalr.service'; 
 export interface TodoItem { text: string; isCompleted?: boolean; }
 export interface TodoList { id: string; name: string; items: TodoItem[]; }
 
@@ -33,6 +32,13 @@ export class App implements OnInit {
     private cdr: ChangeDetectorRef 
   ) {}
 
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Api-Key': 'secret-123'
+    })
+  };
+
   ngOnInit() {
     this.loadRecords();
 
@@ -44,35 +50,48 @@ export class App implements OnInit {
     });
   }
  
-  loadRecords() { 
+ loadRecords() { 
     const skip = this.currentPage * this.pageSize;
     const myId = this.signalrService.currentUserId;
- 
-    const query = {
-      query: `
-        query {
-          records(
-            userId: "${myId}",
-            skip: ${skip}, 
-            take: ${this.pageSize}, 
-            order: { createdAt: DESC }, 
-            where: { name: { contains: "${this.filterText}" } }
-          ) {
-            totalCount
+
+    const queryOperation = `
+      query GetRecords($userId: String!, $skip: Int!, $take: Int!, $filter: String) {
+        records(
+          userId: $userId,
+          skip: $skip, 
+          take: $take, 
+          order: { createdAt: DESC }, 
+          where: { name: { contains: $filter } }
+        ) {
+          totalCount
+          items {
+            id
+            name
             items {
-              id
-              name
-              items {
-                text
-              }
+              text
             }
           }
         }
-      `
+      }
+    `;
+
+    const variables = {
+      userId: myId,
+      skip: skip,
+      take: this.pageSize,
+      filter: this.filterText
     };
 
-    this.http.post<any>('https://localhost:7171/graphql', query).subscribe({
+    this.http.post<any>(
+      'https://localhost:7171/graphql', 
+      { query: queryOperation, variables: variables },
+      this.httpOptions
+    ).subscribe({
       next: (res) => {
+        if (res.errors) {
+          console.error('GraphQL error:', res.errors);
+            return;
+        }
         const data = res.data?.records;
         if (data) {
           this.records = data.items; 
@@ -80,7 +99,7 @@ export class App implements OnInit {
           this.cdr.detectChanges();
         }
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('Networks error:', err)
     });
   }
 
@@ -106,30 +125,47 @@ export class App implements OnInit {
   sendMessage() {
     const myId = this.signalrService.currentUserId;
     if (!this.listName || !this.listItemsStr) return;
- 
+
     const nameToSend = this.listName; 
-    const rawItemsStr = this.listItemsStr;
+    
+    const itemsData = this.listItemsStr
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => ({ text: s }));
 
-    const itemsArray = rawItemsStr.split(',').map(s => s.trim()).filter(s => s.length > 0)
-        .map(s => `{ text: "${s}" }`); 
-    const itemsGraphQLString = `[${itemsArray.join(', ')}]`;
-
+    // Очищаем форму сразу
     this.listName = ''; 
     this.listItemsStr = '';
 
-    const query = {
-      query: `
-        mutation { 
-          addRecord(userId: "${myId}", name: "${nameToSend}",  items: ${itemsGraphQLString}) { 
-            id 
-          } 
-        }`
+    const mutationOperation = `
+      mutation AddRecord($userId: String!, $name: String!, $items: [RecordItemInput!]!) { 
+        addRecord(userId: $userId, name: $name, items: $items) { 
+          id 
+        } 
+      }`;
+
+    const variables = {
+      userId: myId,
+      name: nameToSend,
+      items: itemsData
     };
 
-    this.http.post('https://localhost:7171/graphql', query).subscribe({ 
+    this.http.post<any>(
+      'https://localhost:7171/graphql', 
+      { query: mutationOperation, variables: variables }, 
+      this.httpOptions
+    ).subscribe({ 
+      next: (res) => {
+         if (res.errors) {
+           console.error('Mutation error :', res.errors);
+             this.listName = nameToSend;
+             this.listItemsStr = itemsData.map(x => x.text).join(', ');
+         }
+      },
       error: (err) => {
+        console.error(err);
         this.listName = nameToSend;
-        this.listItemsStr = rawItemsStr;
       }
     });
   }

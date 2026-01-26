@@ -1,5 +1,6 @@
 ﻿using HotChocolate.Subscriptions;
 using IPR2.Hubs;
+using IPR2App.Attributes;
 using IPR2App.Models;
 using IPR2App.Services;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +10,7 @@ namespace IPR2App.GraphQL
 {
     public class Mutation
     {
+        [ApiKey]
         public async Task<RecordModel> AddRecord(
             [Service] IMongoCollection<RecordModel> collection,
             [Service] IHubContext<RecordsHub> hubContext,

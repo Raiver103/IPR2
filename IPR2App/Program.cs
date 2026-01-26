@@ -1,5 +1,6 @@
 using IPR2.Hubs;
 using IPR2App.GraphQL;
+using IPR2App.Middleware;
 using IPR2App.Models;
 using IPR2App.Services;
 using MongoDB.Driver;
@@ -42,6 +43,7 @@ builder.Services
     .AddMongoDbProjections()
     .AddMongoDbPagingProviders();
 
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
  
 
@@ -53,7 +55,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection(); 
 app.UseRouting();
-app.UseCors("AngularClient");
+app.UseCors("AngularClient"); 
 
 app.UseAuthorization();
 app.UseSwagger();
