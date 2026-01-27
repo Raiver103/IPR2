@@ -1,6 +1,5 @@
 using IPR2.Hubs;
 using IPR2App.GraphQL;
-using IPR2App.Middleware;
 using IPR2App.Models;
 using IPR2App.Services;
 using MongoDB.Driver;
@@ -38,8 +37,8 @@ builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
-    .AddMongoDbFiltering()   
-    .AddMongoDbSorting()      
+    .AddMongoDbFiltering()
+    .AddMongoDbSorting()
     .AddMongoDbProjections()
     .AddMongoDbPagingProviders();
 
@@ -53,9 +52,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection(); 
+app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors("AngularClient"); 
+app.UseCors("AngularClient");
 
 app.UseAuthorization();
 app.UseSwagger();

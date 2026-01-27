@@ -13,18 +13,16 @@ namespace IPR2App.GraphQL
         [ApiKey]
         public async Task<RecordModel> AddRecord(
             [Service] IMongoCollection<RecordModel> collection,
-            [Service] IHubContext<RecordsHub> hubContext,
-            string name,
-            List<RecordItemInput> items,
-            string userId)
+            [Service] IHubContext<RecordsHub> hubContext, 
+            AddRecordPayload input)
         {
             var newRecord = new RecordModel
             {
                 Id = Guid.NewGuid(),
-                Name = name,
-                CreatedAt = DateTime.UtcNow, 
-                UserId = userId,
-                Items = items.Select(x => new RecordItem
+                Name = input.Name,
+                CreatedAt = DateTime.UtcNow,
+                UserId = input.UserId,
+                Items = input.Items.Select(x => new RecordItem
                 {
                     Text = x.Text,
                     IsCompleted = false
