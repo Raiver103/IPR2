@@ -8,13 +8,16 @@ var builder = WebApplication.CreateBuilder(args);
 var mongoClient = new MongoClient("mongodb://localhost:27017");
 var mongoDatabase = mongoClient.GetDatabase("IPR2Database");
 
-builder.Services.AddControllers(); 
-builder.Services.AddSignalR();
+builder.Services.AddControllers();
+
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis(builder.Configuration.GetConnectionString("Redis"));
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<MongoService>();
 
 builder.Services.AddSingleton<IMongoCollection<RecordModel>>(sp =>
-{
+{   
     var db = sp.GetRequiredService<IMongoDatabase>();
     return db.GetCollection<RecordModel>("Records");
 });
@@ -31,7 +34,7 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod()
               .AllowCredentials();
     });
-});
+}); 
 
 builder.Services
     .AddGraphQLServer()
