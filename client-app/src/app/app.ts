@@ -83,7 +83,7 @@ export class App implements OnInit {
     };
 
     this.http.post<any>(
-      'https://localhost:7171/graphql', 
+      'http://localhost:7171/graphql', 
       { query: queryOperation, variables: variables },
       this.httpOptions
     ).subscribe({
@@ -127,40 +127,45 @@ export class App implements OnInit {
     if (!this.listName || !this.listItemsStr) return;
 
     const nameToSend = this.listName; 
-    
+     
     const itemsData = this.listItemsStr
         .split(',')
         .map(s => s.trim())
         .filter(s => s.length > 0)
         .map(s => ({ text: s }));
-
-    // Очищаем форму сразу
+ 
     this.listName = ''; 
     this.listItemsStr = '';
-
+ 
+    const payload = {
+       userId: myId,
+       name: nameToSend,
+       items: itemsData
+    };
+ 
     const mutationOperation = `
-      mutation AddRecord($userId: String!, $name: String!, $items: [RecordItemInput!]!) { 
-        addRecord(userId: $userId, name: $name, items: $items) { 
+      mutation AddRecord($input: AddRecordPayloadInput!) { 
+        addRecord(input: $input) { 
           id 
         } 
       }`;
-
+ 
     const variables = {
-      userId: myId,
-      name: nameToSend,
-      items: itemsData
+      input: payload
     };
 
     this.http.post<any>(
-      'https://localhost:7171/graphql', 
+      'http://localhost:7171/graphql', 
       { query: mutationOperation, variables: variables }, 
       this.httpOptions
     ).subscribe({ 
       next: (res) => {
          if (res.errors) {
-           console.error('Mutation error :', res.errors);
+           console.error('Mutation error :', res.errors); 
              this.listName = nameToSend;
              this.listItemsStr = itemsData.map(x => x.text).join(', ');
+         } else {
+             console.log('Success:', res.data);
          }
       },
       error: (err) => {
