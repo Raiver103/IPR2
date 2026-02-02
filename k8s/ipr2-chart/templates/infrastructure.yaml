@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: databases
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: infrastructure
+  template:
+    metadata:
+      labels:
+        app: infrastructure
+    spec:
+      containers:
+        - name: mongo
+          image: {{ .Values.mongo.image }}
+          ports: [{ containerPort: {{ .Values.mongo.port }} }]
+        - name: redis
+          image: {{ .Values.redis.image }}
+          ports: [{ containerPort: {{ .Values.redis.port }} }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  ports: [{ port: 27017, targetPort: 27017 }]
+  selector:
+    app: infrastructure
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  ports: [{ port: 6379, targetPort: 6379 }]
+  selector:
+    app: infrastructure
