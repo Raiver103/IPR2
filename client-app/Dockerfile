@@ -11,8 +11,8 @@ COPY . .
 RUN mkdir -p src/environments && \
     printf "export const environment = { \
       production: true, \
-      apiUrl: 'http://localhost:7171/graphql', \
-      hubUrl: 'http://localhost:7171/records-hub' \
+      apiUrl: 'http://ipr2.local/graphql', \
+      hubUrl: 'http://ipr2.local/records-hub' \
     };\n" > src/environments/environment.prod.ts
 
 RUN ng build --configuration production

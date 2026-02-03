@@ -19,7 +19,7 @@ export class SignalrService {
       const userId = this.getOrCreateUserId();
       
       this.hubConnection = new signalR.HubConnectionBuilder()
-        .withUrl(`http://localhost:7171/records-hub?userId=${userId}`)
+        .withUrl(`http://http://ipr2.local/records-hub?userId=${userId}`)
         .withAutomaticReconnect()
         .build();
     }

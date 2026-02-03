@@ -1,0 +1,21 @@
+backend:
+  replicas: 2
+  
+  imagePullPolicy: IfNotPresent
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2   
+    maxReplicas: 10   
+    targetCPU: 60     
+
+  resources:
+    requests:
+      cpu: 200m     
+      memory: 256Mi
+    limits:
+      cpu: 1000m    
+      memory: 1Gi
+
+ingress:
+  host: ipr2.local
