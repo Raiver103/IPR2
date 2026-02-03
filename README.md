@@ -10,7 +10,7 @@
 * **Ingress:** NGINX Ingress Controller
 * **Monitoring:** Metrics Server + HPA
 * **Storage:** MongoDB, Redis
-* **Backend:** .NET (Docker container)
+* **Backend:** .NET 10 (Docker container)
 * **Frontend:** React/SPA (Docker container)
 
 ---
