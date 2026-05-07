@@ -1,9 +1,9 @@
 #  IPR2: Microservices on Kubernetes
 
-Проект представляет собой Fullstack-приложение, развернутое в Kubernetes с использованием **Helm Charts**.
-Архитектура включает Backend, Frontend, базы данных (Mongo, Redis), настроенный Ingress Controller и автоматическое масштабирование (HPA).
+The project is a full-stack application deployed in Kubernetes using Helm Charts.
+The architecture includes a backend, frontend, databases (Mongo, Redis), a configured Ingress Controller, and autoscaling (HPA).
 
-## Технический стек
+## Tech stack
 
 * **Infrastructure:** Kubernetes (Docker Desktop / Minikube)
 * **Orchestration:** Helm v3
@@ -15,15 +15,15 @@
 
 ---
 
-## Предварительные требования
+## Prerequisites
 
-Перед запуском убедитесь, что у вас установлены:
-1.  **Docker Desktop** (с включенным Kubernetes).
-2.  **Helm** (установлен и добавлен в PATH).
+Before starting, make sure you have installed:
+1.  **Docker Desktop** (with Kubernetes enabled).
+2.  **Helm** (installed and added to PATH).
 3.  **Kubectl**.
 
-### Важная настройка для Windows
-Так как мы используем локальные домены, добавьте следующие строки в файл `C:\Windows\System32\drivers\etc\hosts`:
+### Important setting for Windows
+Since we are using local domains, add the following lines to the file `C:\Windows\System32\drivers\etc\hosts`:
 
 ```text
 127.0.0.1  ipr2.local 
